@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
-import { router } from 'expo-router'
+import { router, Redirect } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useOnboardingStore } from '@/store/onboardingStore'
 import {
   useSessionStore,
   selectTotalMinutes,
@@ -11,7 +12,10 @@ import { BuddhaLevelCard } from '@/components/BuddhaLevelCard'
 import { theme } from '@/theme'
 
 export default function HomeScreen() {
-  const insets       = useSafeAreaInsets()
+  const insets             = useSafeAreaInsets()
+  const onboardingComplete = useOnboardingStore((s) => s.completed)
+
+  if (!onboardingComplete) return <Redirect href="/onboarding" />
   const totalMinutes = useSessionStore(selectTotalMinutes)
   const sessionCount = useSessionStore(selectSessionCount)
   const streak       = useSessionStore(selectCurrentStreak)

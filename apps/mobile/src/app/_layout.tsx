@@ -24,6 +24,10 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" />
           <Stack.Screen
+            name="onboarding"
+            options={{ animation: 'fade', gestureEnabled: false }}
+          />
+          <Stack.Screen
             name="timer"
             options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
           />
