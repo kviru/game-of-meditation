@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Mobile (Expo)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "android", "--workspace=apps/mobile"],
+      "port": 8081
+    },
+    {
+      "name": "Web (Next.js)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace=apps/web"],
+      "port": 3000
+    },
+    {
+      "name": "Supabase (local)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["supabase", "start"],
+      "port": 54321
+    }
+  ]
+}

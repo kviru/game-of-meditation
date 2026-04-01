@@ -1,0 +1,23 @@
+{
+  "name": "game-of-meditation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Game of Meditation — a gamified open source meditation platform for all humanity",
+  "license": "MIT",
+  "workspaces": [
+    "apps/mobile",
+    "apps/web",
+    "packages/shared"
+  ],
+  "scripts": {
+    "mobile": "npm run start --workspace=apps/mobile",
+    "web": "npm run dev --workspace=apps/web",
+    "build:web": "npm run build --workspace=apps/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

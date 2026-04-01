@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3:*)",
+      "Bash(npm --version)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm install:*)",
+      "Bash(npx expo:*)",
+      "Bash(EXPO_YES=1 npx expo start --android)",
+      "Bash(adb devices:*)",
+      "Bash(pip install:*)",
+      "Bash(./gradlew app:assembleDebug --no-daemon -x lint -x test --stacktrace)",
+      "Bash(./gradlew --stop)",
+      "Bash(java -version)",
+      "Bash(echo $JAVA_HOME)",
+      "Bash(JAVA_TOOL_OPTIONS=\"-Djava.nio.channels.spi.SelectorProvider=sun.nio.ch.WindowsSelectorProvider\" npx expo run:android)",
+      "Bash(cmd /c \"cd /d C:\\\\devworkspace\\\\mobileapps\\\\gameoflife\\\\gameoflife\\\\apps\\\\mobile\\\\android && gradlew.bat app:assembleDebug -x lint -x test --no-daemon --stacktrace 2>&1\")",
+      "Bash(/tmp/build_android.bat:*)",
+      "Bash(cmd /c \"C:\\\\Users\\\\VIRU~1.KUL\\\\AppData\\\\Local\\\\Temp\\\\build_android.bat\")",
+      "Bash(\"/c/Program Files/Android/Android Studio/jbr/bin/java\" -version)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Android/Android Studio/jbr\" PATH=\"/c/Program Files/Android/Android Studio/jbr/bin:$PATH\" cd /c/devworkspace/mobileapps/gameoflife/gameoflife/apps/mobile)",
+      "Bash(JAVA_HOME=\"/c/Program Files/Android/Android Studio/jbr\" PATH=\"/c/Program Files/Android/Android Studio/jbr/bin:$PATH\" npx expo run:android)",
+      "Bash(GRADLE_OPTS=\"-Djava.nio.channels.spi.SelectorProvider=sun.nio.ch.WindowsSelectorProvider -Djava.net.preferIPv4Stack=true\" ./gradlew app:assembleDebug -x lint -x test)",
+      "Bash(powershell -Command \"Set-Location ''C:\\\\devworkspace\\\\mobileapps\\\\gameoflife\\\\gameoflife\\\\apps\\\\mobile\\\\android''; .\\\\gradlew.bat app:assembleDebug -x lint -x test 2>&1\")",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files/Eclipse Adoptium//**)",
+      "Read(//c/Program Files/Microsoft//**)",
+      "Bash(where java:*)",
+      "WebSearch",
+      "Bash(gh release:*)",
+      "WebFetch(domain:expo.dev)",
+      "Bash(curl -L \"https://github.com/expo/expo-go-releases/releases/download/Expo-Go-2.32.20/Expo-Go-2.32.20.apk\" -o \"/c/Users/viru.kulkarni/AppData/Local/Temp/ExpoGo-2.32.20.apk\")",
+      "Bash(adb -s emulator-5554 install -r \"/c/Users/viru.kulkarni/AppData/Local/Temp/ExpoGo-2.32.20.apk\")",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

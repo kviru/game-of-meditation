@@ -1,0 +1,32 @@
+:root {
+  --background: #0d1f0d;
+  --surface: #152815;
+  --primary: #4caf6e;
+  --primary-dark: #388e50;
+  --text-primary: #f0f7f0;
+  --text-secondary: #8ab898;
+  --text-muted: #4d6b55;
+  --gold: #c9a84c;
+  --border: #1e3d24;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

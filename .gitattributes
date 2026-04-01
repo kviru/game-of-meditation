@@ -1,0 +1,11 @@
+# Normalise line endings to LF in the repo, checkout as-is on all platforms
+* text=auto eol=lf
+
+# Binaries — never touch
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.apk binary
+*.keystore binary
