@@ -15,6 +15,7 @@ import {
   selectTotalMinutes,
   selectSessionCount,
 } from '@/store/sessionStore'
+import { useProgramStore } from '@/store/programStore'
 import { useT } from '@/hooks/useT'
 import { theme } from '@/theme'
 
@@ -44,8 +45,14 @@ export default function SessionCompleteScreen() {
   const lastSession = useSessionStore(selectLastSession)
   const totalMinutes = useSessionStore(selectTotalMinutes)
   const sessionCount = useSessionStore(selectSessionCount)
-  const resetTimer = useSessionStore((s) => s.resetTimer)
-  const t          = useT()
+  const resetTimer            = useSessionStore((s) => s.resetTimer)
+  const activeProgramSession  = useProgramStore((s) => s.activeProgramSession)
+  const completeDay           = useProgramStore((s) => s.completeDay)
+  const setActiveProgramSession = useProgramStore((s) => s.setActiveProgramSession)
+  const t                     = useT()
+
+  // Capture which program (if any) this session was for, before the effect clears it
+  const completedProgramId = activeProgramSession?.programId ?? null
 
   const cardScale = useSharedValue(0.88)
   const cardOpacity = useSharedValue(0)
@@ -55,6 +62,17 @@ export default function SessionCompleteScreen() {
     cardScale.value = withSpring(1, { damping: 14, stiffness: 100 })
     cardOpacity.value = withTiming(1, { duration: 500 })
     statsOpacity.value = withDelay(400, withTiming(1, { duration: 600 }))
+
+    // Credit program day if this session was started from a program
+    if (activeProgramSession && lastSession) {
+      completeDay(
+        activeProgramSession.programId,
+        activeProgramSession.dayNumber,
+        lastSession.id,
+        lastSession.durationSeconds,
+      )
+      setActiveProgramSession(null)
+    }
   }, [])
 
   const cardStyle = useAnimatedStyle(() => ({
@@ -114,6 +132,17 @@ export default function SessionCompleteScreen() {
 
       {/* Actions */}
       <View style={styles.actions}>
+        {completedProgramId && (
+          <Pressable
+            style={styles.programButton}
+            onPress={() => {
+              resetTimer()
+              router.replace(`/programs/${completedProgramId}`)
+            }}
+          >
+            <Text style={styles.programButtonText}>📅 View Program Progress</Text>
+          </Pressable>
+        )}
         <Pressable
           style={styles.feedbackButton}
           onPress={() => router.push({ pathname: '/feedback', params: { sessionId: lastSession.id } })}
@@ -210,6 +239,19 @@ const styles = StyleSheet.create({
   },
   actions: {
     gap: 12,
+  },
+  programButton: {
+    paddingVertical: 16,
+    borderRadius: theme.radii.lg,
+    alignItems: 'center',
+    backgroundColor: theme.colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  programButtonText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
   feedbackButton: {
     paddingVertical: 16,

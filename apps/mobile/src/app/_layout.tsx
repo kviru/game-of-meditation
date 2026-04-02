@@ -93,6 +93,14 @@ export default function RootLayout() {
             name="guided"
             options={{ animation: 'slide_from_bottom' }}
           />
+          <Stack.Screen
+            name="programs"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="programs/[id]"
+            options={{ animation: 'slide_from_right' }}
+          />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

@@ -100,6 +100,13 @@ export default function HomeScreen() {
 
         <Pressable
           style={styles.secondaryButton}
+          onPress={() => router.push('/programs')}
+        >
+          <Text style={styles.secondaryButtonText}>📅 21-Day Programs</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.secondaryButton}
           onPress={() => router.push('/clubs')}
         >
           <Text style={styles.secondaryButtonText}>👥 Clubs</Text>
