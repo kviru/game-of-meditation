@@ -26,6 +26,7 @@ import {
   selectGoalReached,
   PRESETS,
 } from '@/store/sessionStore'
+import { SessionTypeSelector } from '@/components/SessionTypeSelector'
 import { useT } from '@/hooks/useT'
 import { theme } from '@/theme'
 
@@ -47,9 +48,11 @@ export default function TimerScreen() {
   const { timerState, elapsedSeconds, start, pause, resume, end, isRunning, isPaused, isIdle } =
     useTimer()
 
-  const activePreset  = useSessionStore((s) => s.activePreset)
-  const setPreset     = useSessionStore((s) => s.setPreset)
-  const goalReached   = useSessionStore(selectGoalReached)
+  const activePreset       = useSessionStore((s) => s.activePreset)
+  const setPreset          = useSessionStore((s) => s.setPreset)
+  const activeSessionType  = useSessionStore((s) => s.activeSessionType)
+  const setSessionType     = useSessionStore((s) => s.setSessionType)
+  const goalReached        = useSessionStore(selectGoalReached)
 
   // Goal reached pulse animation
   const goalScale   = useSharedValue(1)
@@ -162,10 +165,11 @@ export default function TimerScreen() {
         )}
       </View>
 
-      {/* Preset selector (idle only) */}
+      {/* Preset + session type selector (idle only) */}
       {isIdle && (
         <View style={styles.presetArea}>
           <PresetSelector selected={activePreset} onSelect={setPreset} />
+          <SessionTypeSelector selected={activeSessionType} onSelect={setSessionType} />
         </View>
       )}
 

@@ -71,6 +71,14 @@ export default function RootLayout() {
             name="auth-confirm"
             options={{ animation: 'fade', gestureEnabled: false }}
           />
+          <Stack.Screen
+            name="settings"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="profile"
+            options={{ animation: 'slide_from_right' }}
+          />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

@@ -41,9 +41,14 @@ export default function HomeScreen() {
       <View style={styles.hero}>
         <View style={styles.heroTop}>
           <Text style={styles.title}>{t.appTitle}</Text>
-          <Pressable onPress={() => router.push('/auth')} hitSlop={12}>
-            <Text style={styles.authLink}>{user ? '👤' : 'Sign in'}</Text>
-          </Pressable>
+          <View style={styles.heroActions}>
+            <Pressable onPress={() => router.push(user ? '/profile' : '/auth')} hitSlop={12}>
+              <Text style={styles.authLink}>{user ? '👤' : 'Sign in'}</Text>
+            </Pressable>
+            <Pressable onPress={() => router.push('/settings')} hitSlop={12}>
+              <Text style={styles.authLink}>⚙️</Text>
+            </Pressable>
+          </View>
         </View>
         <Text style={styles.tagline}>{t.tagline}</Text>
       </View>
@@ -116,10 +121,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
+  heroActions: {
+    flexDirection: 'row',
+    gap: 14,
+    paddingTop: 8,
+  },
   authLink: {
     fontSize: 14,
     color: theme.colors.textMuted,
-    paddingTop: 8,
   },
   title: {
     fontSize: 48,

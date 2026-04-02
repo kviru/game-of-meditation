@@ -1,10 +1,12 @@
-import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native'
+import { View, Text, FlatList, Pressable, StyleSheet, ScrollView } from 'react-native'
 import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useSessionStore, selectCurrentStreak, selectTotalMinutes } from '@/store/sessionStore'
 import type { CompletedSession } from '@/store/sessionStore'
 import { useT } from '@/hooks/useT'
 import type { Strings } from '@/lib/translations'
+import { MeditationHeatmap } from '@/components/MeditationHeatmap'
+import { SESSION_TYPES } from '@/store/sessionStore'
 import { theme } from '@/theme'
 
 function formatDuration(seconds: number): string {
@@ -54,7 +56,9 @@ function SessionRow({ session }: { session: CompletedSession }) {
   })
   return (
     <View style={styles.row}>
-      <Text style={styles.rowEmoji}>{sessionEmoji(session.durationSeconds)}</Text>
+      <Text style={styles.rowEmoji}>
+        {SESSION_TYPES.find(t => t.key === session.sessionType)?.emoji ?? sessionEmoji(session.durationSeconds)}
+      </Text>
       <View style={styles.rowMain}>
         <View style={styles.rowTop}>
           <Text style={styles.rowDuration}>{formatDuration(session.durationSeconds)}</Text>
@@ -131,6 +135,16 @@ export default function HistoryScreen() {
           <Text style={styles.statLabel}>{t.totalMss}</Text>
         </View>
       </View>
+
+      {/* Activity heatmap */}
+      {sessions.length > 0 && (
+        <View style={styles.heatmapCard}>
+          <Text style={styles.heatmapTitle}>Activity — last 12 weeks</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <MeditationHeatmap sessions={sessions} />
+          </ScrollView>
+        </View>
+      )}
 
       {/* Session list */}
       {sessions.length === 0 ? (
@@ -213,6 +227,22 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     backgroundColor: theme.colors.border,
+  },
+  heatmapCard: {
+    marginHorizontal: 24,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radii.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: 16,
+    gap: 12,
+    marginBottom: 8,
+  },
+  heatmapTitle: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   list: {
     paddingHorizontal: 24,

@@ -10,12 +10,27 @@ export interface CompletedSession {
   mssDelta: number
   presetLabel: string | null   // 'Free', '5 min', '10 min', etc.
   goalReached: boolean
+  sessionType: SessionTypeKey  // meditation tradition/style
 }
 
 export interface Preset {
   label: string
   seconds: number | null       // null = free / no target
 }
+
+export const SESSION_TYPES = [
+  { key: 'open',        label: 'Open Awareness', emoji: '🌌' },
+  { key: 'breathwork',  label: 'Breathwork',      emoji: '🌬️' },
+  { key: 'vipassana',   label: 'Vipassana',       emoji: '👁️' },
+  { key: 'metta',       label: 'Loving-Kindness',  emoji: '💚' },
+  { key: 'mantra',      label: 'Mantra',           emoji: '🔔' },
+  { key: 'body_scan',   label: 'Body Scan',        emoji: '🧍' },
+  { key: 'yoga_nidra',  label: 'Yoga Nidra',       emoji: '🌙' },
+  { key: 'zen',         label: 'Zen',              emoji: '⛩️' },
+  { key: 'chakra',      label: 'Chakra',           emoji: '🟣' },
+] as const
+
+export type SessionTypeKey = typeof SESSION_TYPES[number]['key']
 
 export const PRESETS: Preset[] = [
   { label: 'Free',   seconds: null },
@@ -31,8 +46,9 @@ interface SessionStore {
   elapsedSeconds: number
   sessionStartedAt: string | null
 
-  // Active preset (not persisted)
+  // Active preset + type (not persisted)
   activePreset: Preset
+  activeSessionType: SessionTypeKey
   goalReachedAt: number | null
 
   // History (persisted)
@@ -44,6 +60,7 @@ interface SessionStore {
   // Timer actions
   setTimerState: (state: TimerState) => void
   setPreset: (preset: Preset) => void
+  setSessionType: (type: SessionTypeKey) => void
   incrementSecond: () => void
   startSession: () => void
   endSession: () => void
@@ -71,6 +88,7 @@ export const useSessionStore = create<SessionStore>()(
       elapsedSeconds: 0,
       sessionStartedAt: null,
       activePreset: PRESETS[0],
+      activeSessionType: 'open' as SessionTypeKey,
       goalReachedAt: null,
       completedSessions: [],
       totalSeconds: 0,
@@ -80,6 +98,8 @@ export const useSessionStore = create<SessionStore>()(
       setTimerState: (state) => set({ timerState: state }),
 
       setPreset: (preset) => set({ activePreset: preset }),
+
+      setSessionType: (type) => set({ activeSessionType: type }),
 
       incrementSecond: () =>
         set((s) => {
@@ -100,7 +120,7 @@ export const useSessionStore = create<SessionStore>()(
 
       endSession: () => {
         const {
-          elapsedSeconds, activePreset, goalReachedAt,
+          elapsedSeconds, activePreset, activeSessionType, goalReachedAt,
           completedSessions, totalSeconds, currentStreak, lastSessionDate,
         } = get()
 
@@ -114,6 +134,7 @@ export const useSessionStore = create<SessionStore>()(
           mssDelta,
           presetLabel: activePreset.label === 'Free' ? null : activePreset.label,
           goalReached,
+          sessionType: activeSessionType,
         }
 
         // Streak logic
@@ -144,6 +165,7 @@ export const useSessionStore = create<SessionStore>()(
           sessionStartedAt: null,
           goalReachedAt: null,
           activePreset: PRESETS[0],
+          activeSessionType: 'open' as SessionTypeKey,
         }),
     }),
     {
