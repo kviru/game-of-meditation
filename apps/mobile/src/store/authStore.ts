@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 
 interface AuthStore {
   session: Session | null
@@ -28,6 +28,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   clearError: () => set({ error: null }),
 
   signUp: async (email, password, username) => {
+    if (!isSupabaseConfigured) { set({ error: 'Supabase not configured.' }); return }
     set({ loading: true, error: null })
     const { error } = await supabase.auth.signUp({
       email,
@@ -44,6 +45,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   signIn: async (email, password) => {
+    if (!isSupabaseConfigured) { set({ error: 'Supabase not configured.' }); return }
     set({ loading: true, error: null })
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {

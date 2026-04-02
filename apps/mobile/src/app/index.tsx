@@ -42,8 +42,8 @@ export default function HomeScreen() {
         <View style={styles.heroTop}>
           <Text style={styles.title}>{t.appTitle}</Text>
           <View style={styles.heroActions}>
-            <Pressable onPress={() => router.push(user ? '/profile' : '/auth')} hitSlop={12}>
-              <Text style={styles.authLink}>{user ? '👤' : 'Sign in'}</Text>
+            <Pressable onPress={() => router.push('/profile')} hitSlop={12}>
+              <Text style={styles.authLink}>{user ? '👤' : '👤'}</Text>
             </Pressable>
             <Pressable onPress={() => router.push('/settings')} hitSlop={12}>
               <Text style={styles.authLink}>⚙️</Text>

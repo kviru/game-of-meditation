@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar'
 import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
 import { syncLocalSessionsToCloud } from '@/lib/syncSessions'
 
@@ -15,6 +15,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     SplashScreen.hideAsync()
+
+    if (!isSupabaseConfigured) return
 
     // Restore existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
