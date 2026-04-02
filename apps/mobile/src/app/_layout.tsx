@@ -4,12 +4,32 @@ import { StatusBar } from 'expo-status-bar'
 import * as SplashScreen from 'expo-splash-screen'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/store/authStore'
+import { syncLocalSessionsToCloud } from '@/lib/syncSessions'
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+  const setSession = useAuthStore((s) => s.setSession)
+
   useEffect(() => {
     SplashScreen.hideAsync()
+
+    // Restore existing session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    // Listen for auth state changes (sign in, sign out, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session)
+      if (event === 'SIGNED_IN' && session?.user) {
+        syncLocalSessionsToCloud(session.user.id)
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   return (
@@ -42,6 +62,14 @@ export default function RootLayout() {
           <Stack.Screen
             name="feedback"
             options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen
+            name="auth"
+            options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="auth-confirm"
+            options={{ animation: 'fade', gestureEnabled: false }}
           />
         </Stack>
       </SafeAreaProvider>

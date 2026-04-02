@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
 import { router, Redirect } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useOnboardingStore } from '@/store/onboardingStore'
+import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import {
   useSessionStore,
@@ -15,6 +16,7 @@ import { theme } from '@/theme'
 export default function HomeScreen() {
   const insets             = useSafeAreaInsets()
   const onboardingComplete = useOnboardingStore((s) => s.completed)
+  const user               = useAuthStore((s) => s.user)
   const t                  = useT()
 
   if (!onboardingComplete) return <Redirect href="/onboarding" />
@@ -37,7 +39,12 @@ export default function HomeScreen() {
     >
       {/* Hero */}
       <View style={styles.hero}>
-        <Text style={styles.title}>{t.appTitle}</Text>
+        <View style={styles.heroTop}>
+          <Text style={styles.title}>{t.appTitle}</Text>
+          <Pressable onPress={() => router.push('/auth')} hitSlop={12}>
+            <Text style={styles.authLink}>{user ? '👤' : 'Sign in'}</Text>
+          </Pressable>
+        </View>
         <Text style={styles.tagline}>{t.tagline}</Text>
       </View>
 
@@ -103,6 +110,16 @@ const styles = StyleSheet.create({
   },
   hero: {
     gap: 12,
+  },
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  authLink: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+    paddingTop: 8,
   },
   title: {
     fontSize: 48,
