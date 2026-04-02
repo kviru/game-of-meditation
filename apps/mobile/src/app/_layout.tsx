@@ -39,6 +39,10 @@ export default function RootLayout() {
             name="history"
             options={{ animation: 'slide_from_right' }}
           />
+          <Stack.Screen
+            name="feedback"
+            options={{ animation: 'slide_from_bottom' }}
+          />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

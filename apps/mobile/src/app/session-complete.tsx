@@ -15,6 +15,7 @@ import {
   selectTotalMinutes,
   selectSessionCount,
 } from '@/store/sessionStore'
+import { useT } from '@/hooks/useT'
 import { theme } from '@/theme'
 
 const MESSAGES = [
@@ -44,6 +45,7 @@ export default function SessionCompleteScreen() {
   const totalMinutes = useSessionStore(selectTotalMinutes)
   const sessionCount = useSessionStore(selectSessionCount)
   const resetTimer = useSessionStore((s) => s.resetTimer)
+  const t          = useT()
 
   const cardScale = useSharedValue(0.88)
   const cardOpacity = useSharedValue(0)
@@ -92,7 +94,7 @@ export default function SessionCompleteScreen() {
         <Text style={styles.message}>{randomMessage()}</Text>
 
         <View style={styles.mssBadge}>
-          <Text style={styles.mssLabel}>Mind Stability</Text>
+          <Text style={styles.mssLabel}>{t.mindStability}</Text>
           <Text style={styles.mssValue}>+{lastSession.mssDelta}</Text>
         </View>
       </Animated.View>
@@ -101,22 +103,28 @@ export default function SessionCompleteScreen() {
       <Animated.View style={[styles.stats, statsStyle]}>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{sessionCount}</Text>
-          <Text style={styles.statLabel}>{sessionCount === 1 ? 'Session' : 'Sessions'}</Text>
+          <Text style={styles.statLabel}>{t.sessions}</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{totalMinutes}</Text>
-          <Text style={styles.statLabel}>{totalMinutes === 1 ? 'Minute' : 'Minutes'}</Text>
+          <Text style={styles.statLabel}>{t.minutes}</Text>
         </View>
       </Animated.View>
 
       {/* Actions */}
       <View style={styles.actions}>
+        <Pressable
+          style={styles.feedbackButton}
+          onPress={() => router.push({ pathname: '/feedback', params: { sessionId: lastSession.id } })}
+        >
+          <Text style={styles.feedbackButtonText}>🌿 Share your experience</Text>
+        </Pressable>
         <Pressable style={styles.primaryButton} onPress={handlePlayAgain}>
-          <Text style={styles.primaryButtonText}>Meditate again</Text>
+          <Text style={styles.primaryButtonText}>{t.meditateAgain}</Text>
         </Pressable>
         <Pressable style={styles.secondaryButton} onPress={handleHome}>
-          <Text style={styles.secondaryButtonText}>Return home</Text>
+          <Text style={styles.secondaryButtonText}>{t.returnHome}</Text>
         </Pressable>
       </View>
     </View>
@@ -202,6 +210,18 @@ const styles = StyleSheet.create({
   },
   actions: {
     gap: 12,
+  },
+  feedbackButton: {
+    paddingVertical: 16,
+    borderRadius: theme.radii.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
+  feedbackButtonText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
   },
   primaryButton: {
     backgroundColor: theme.colors.primary,

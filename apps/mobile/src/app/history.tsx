@@ -3,6 +3,8 @@ import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useSessionStore, selectCurrentStreak, selectTotalMinutes } from '@/store/sessionStore'
 import type { CompletedSession } from '@/store/sessionStore'
+import { useT } from '@/hooks/useT'
+import type { Strings } from '@/lib/translations'
 import { theme } from '@/theme'
 
 function formatDuration(seconds: number): string {
@@ -12,13 +14,13 @@ function formatDuration(seconds: number): string {
   return s > 0 ? `${m}m ${s}s` : `${m}m`
 }
 
-function relativeDate(iso: string): string {
+function relativeDate(iso: string, t: Strings): string {
   const d     = new Date(iso)
   const today = new Date()
   const diff  = Math.floor((today.getTime() - d.getTime()) / 86400000)
-  if (diff === 0) return 'Today'
-  if (diff === 1) return 'Yesterday'
-  if (diff < 7)  return `${diff} days ago`
+  if (diff === 0) return t.today
+  if (diff === 1) return t.yesterday
+  if (diff < 7)  return t.daysAgo.replace('{n}', String(diff))
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
@@ -30,11 +32,11 @@ function sessionEmoji(seconds: number): string {
 }
 
 // Group sessions by relative date heading
-function groupSessions(sessions: CompletedSession[]) {
+function groupSessions(sessions: CompletedSession[], t: Strings) {
   const groups: { heading: string; data: CompletedSession[] }[] = []
   let lastHeading = ''
   for (const s of sessions) {
-    const heading = relativeDate(s.completedAt)
+    const heading = relativeDate(s.completedAt, t)
     if (heading !== lastHeading) {
       groups.push({ heading, data: [s] })
       lastHeading = heading
@@ -79,6 +81,7 @@ function SessionRow({ session }: { session: CompletedSession }) {
 
 export default function HistoryScreen() {
   const insets         = useSafeAreaInsets()
+  const t              = useT()
   const sessions       = useSessionStore((s) => s.completedSessions)
   const streak         = useSessionStore(selectCurrentStreak)
   const totalMinutes   = useSessionStore(selectTotalMinutes)
@@ -86,7 +89,7 @@ export default function HistoryScreen() {
     s.completedSessions.reduce((acc, s) => acc + s.mssDelta, 0)
   )
 
-  const groups = groupSessions(sessions)
+  const groups = groupSessions(sessions, t)
 
   // Flat list data: mix of heading strings and session objects
   type ListItem = { type: 'heading'; text: string } | { type: 'session'; session: CompletedSession }
@@ -100,9 +103,9 @@ export default function HistoryScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={16}>
-          <Text style={styles.backText}>← Back</Text>
+          <Text style={styles.backText}>← {t.back}</Text>
         </Pressable>
-        <Text style={styles.title}>Your Journey</Text>
+        <Text style={styles.title}>{t.yourJourney}</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -110,22 +113,22 @@ export default function HistoryScreen() {
       <View style={styles.statsRow}>
         <View style={styles.stat}>
           <Text style={styles.statValue}>{sessions.length}</Text>
-          <Text style={styles.statLabel}>Sessions</Text>
+          <Text style={styles.statLabel}>{t.sessions}</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.stat}>
           <Text style={styles.statValue}>{totalMinutes}</Text>
-          <Text style={styles.statLabel}>Minutes</Text>
+          <Text style={styles.statLabel}>{t.minutes}</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.stat}>
           <Text style={[styles.statValue, { color: theme.colors.gold }]}>{streak}</Text>
-          <Text style={styles.statLabel}>Day streak</Text>
+          <Text style={styles.statLabel}>{t.dayStreak}</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.stat}>
           <Text style={[styles.statValue, { color: theme.colors.primary }]}>{totalMss}</Text>
-          <Text style={styles.statLabel}>Total MSS</Text>
+          <Text style={styles.statLabel}>{t.totalMss}</Text>
         </View>
       </View>
 

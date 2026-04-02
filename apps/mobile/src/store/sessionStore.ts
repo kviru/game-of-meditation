@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import type { TimerState } from '@/hooks/useTimer'
 
 export interface CompletedSession {
@@ -24,16 +26,16 @@ export const PRESETS: Preset[] = [
 ]
 
 interface SessionStore {
-  // Timer state
+  // Timer state (not persisted)
   timerState: TimerState
   elapsedSeconds: number
   sessionStartedAt: string | null
 
-  // Active preset
+  // Active preset (not persisted)
   activePreset: Preset
-  goalReachedAt: number | null  // elapsed seconds when goal was first hit
+  goalReachedAt: number | null
 
-  // History (local, pre-auth)
+  // History (persisted)
   completedSessions: CompletedSession[]
   totalSeconds: number
   currentStreak: number
@@ -62,93 +64,101 @@ function calcMssDelta(durationSeconds: number): number {
   return 30                              // 60+ min
 }
 
-function calcStreak(sessions: CompletedSession[], lastDate: string | null): number {
-  if (sessions.length === 0) return 0
-  const today = new Date().toDateString()
-  const yesterday = new Date(Date.now() - 86400000).toDateString()
-  const last = lastDate ? new Date(lastDate).toDateString() : null
-  if (last !== today && last !== yesterday) return 1
-  return 0 // caller handles increment
-}
-
-export const useSessionStore = create<SessionStore>((set, get) => ({
-  timerState: 'idle',
-  elapsedSeconds: 0,
-  sessionStartedAt: null,
-  activePreset: PRESETS[0],
-  goalReachedAt: null,
-  completedSessions: [],
-  totalSeconds: 0,
-  currentStreak: 0,
-  lastSessionDate: null,
-
-  setTimerState: (state) => set({ timerState: state }),
-
-  setPreset: (preset) => set({ activePreset: preset }),
-
-  incrementSecond: () =>
-    set((s) => {
-      const next = s.elapsedSeconds + 1
-      const target = s.activePreset.seconds
-      const justHitGoal =
-        target !== null &&
-        s.goalReachedAt === null &&
-        next >= target
-      return {
-        elapsedSeconds: next,
-        goalReachedAt: justHitGoal ? next : s.goalReachedAt,
-      }
-    }),
-
-  startSession: () =>
-    set({ sessionStartedAt: new Date().toISOString(), elapsedSeconds: 0, goalReachedAt: null }),
-
-  endSession: () => {
-    const { elapsedSeconds, activePreset, goalReachedAt,
-            completedSessions, totalSeconds, currentStreak, lastSessionDate } = get()
-
-    const mssDelta = calcMssDelta(elapsedSeconds)
-    const goalReached = goalReachedAt !== null
-
-    const session: CompletedSession = {
-      id: Math.random().toString(36).slice(2),
-      durationSeconds: elapsedSeconds,
-      completedAt: new Date().toISOString(),
-      mssDelta,
-      presetLabel: activePreset.label === 'Free' ? null : activePreset.label,
-      goalReached,
-    }
-
-    // Streak logic
-    const today = new Date().toDateString()
-    const yesterday = new Date(Date.now() - 86400000).toDateString()
-    const last = lastSessionDate ? new Date(lastSessionDate).toDateString() : null
-    let newStreak = currentStreak
-    if (last === today) {
-      // already meditated today — no change
-    } else if (last === yesterday) {
-      newStreak = currentStreak + 1
-    } else {
-      newStreak = 1
-    }
-
-    set({
-      completedSessions: [session, ...completedSessions],
-      totalSeconds: totalSeconds + elapsedSeconds,
-      currentStreak: newStreak,
-      lastSessionDate: new Date().toISOString(),
-    })
-  },
-
-  resetTimer: () =>
-    set({
+export const useSessionStore = create<SessionStore>()(
+  persist(
+    (set, get) => ({
       timerState: 'idle',
       elapsedSeconds: 0,
       sessionStartedAt: null,
-      goalReachedAt: null,
       activePreset: PRESETS[0],
+      goalReachedAt: null,
+      completedSessions: [],
+      totalSeconds: 0,
+      currentStreak: 0,
+      lastSessionDate: null,
+
+      setTimerState: (state) => set({ timerState: state }),
+
+      setPreset: (preset) => set({ activePreset: preset }),
+
+      incrementSecond: () =>
+        set((s) => {
+          const next = s.elapsedSeconds + 1
+          const target = s.activePreset.seconds
+          const justHitGoal =
+            target !== null &&
+            s.goalReachedAt === null &&
+            next >= target
+          return {
+            elapsedSeconds: next,
+            goalReachedAt: justHitGoal ? next : s.goalReachedAt,
+          }
+        }),
+
+      startSession: () =>
+        set({ sessionStartedAt: new Date().toISOString(), elapsedSeconds: 0, goalReachedAt: null }),
+
+      endSession: () => {
+        const {
+          elapsedSeconds, activePreset, goalReachedAt,
+          completedSessions, totalSeconds, currentStreak, lastSessionDate,
+        } = get()
+
+        const mssDelta   = calcMssDelta(elapsedSeconds)
+        const goalReached = goalReachedAt !== null
+
+        const session: CompletedSession = {
+          id: Math.random().toString(36).slice(2),
+          durationSeconds: elapsedSeconds,
+          completedAt: new Date().toISOString(),
+          mssDelta,
+          presetLabel: activePreset.label === 'Free' ? null : activePreset.label,
+          goalReached,
+        }
+
+        // Streak logic
+        const today     = new Date().toDateString()
+        const yesterday = new Date(Date.now() - 86400000).toDateString()
+        const last      = lastSessionDate ? new Date(lastSessionDate).toDateString() : null
+        let newStreak   = currentStreak
+        if (last === today) {
+          // already meditated today — streak unchanged
+        } else if (last === yesterday) {
+          newStreak = currentStreak + 1
+        } else {
+          newStreak = 1
+        }
+
+        set({
+          completedSessions: [session, ...completedSessions],
+          totalSeconds: totalSeconds + elapsedSeconds,
+          currentStreak: newStreak,
+          lastSessionDate: new Date().toISOString(),
+        })
+      },
+
+      resetTimer: () =>
+        set({
+          timerState: 'idle',
+          elapsedSeconds: 0,
+          sessionStartedAt: null,
+          goalReachedAt: null,
+          activePreset: PRESETS[0],
+        }),
     }),
-}))
+    {
+      name: 'session',
+      storage: createJSONStorage(() => AsyncStorage),
+      // Only persist history — never the live timer state
+      partialize: (s) => ({
+        completedSessions: s.completedSessions,
+        totalSeconds:      s.totalSeconds,
+        currentStreak:     s.currentStreak,
+        lastSessionDate:   s.lastSessionDate,
+      }),
+    }
+  )
+)
 
 // ─── Selectors ─────────────────────────────────────────────────
 

@@ -26,14 +26,8 @@ import {
   selectGoalReached,
   PRESETS,
 } from '@/store/sessionStore'
+import { useT } from '@/hooks/useT'
 import { theme } from '@/theme'
-
-const BREATH_LABELS: Record<string, string> = {
-  idle:    "Whenever you're ready",
-  running: 'Breathe',
-  paused:  'Resting',
-  ended:   '',
-}
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`
@@ -49,6 +43,7 @@ function formatTarget(seconds: number): string {
 
 export default function TimerScreen() {
   const insets = useSafeAreaInsets()
+  const t      = useT()
   const { timerState, elapsedSeconds, start, pause, resume, end, isRunning, isPaused, isIdle } =
     useTimer()
 
@@ -127,14 +122,16 @@ export default function TimerScreen() {
           onPress={isIdle ? () => router.back() : confirmEnd}
           hitSlop={16}
         >
-          <Text style={styles.headerAction}>{isIdle ? 'Back' : 'End'}</Text>
+          <Text style={styles.headerAction}>{isIdle ? t.back : t.end}</Text>
         </Pressable>
       </View>
 
       {/* Breathing visual */}
       <View style={styles.visualArea}>
         <BreathingCircle isRunning={isRunning} isPaused={isPaused} size={240} />
-        <Text style={styles.breathLabel}>{BREATH_LABELS[timerState]}</Text>
+        <Text style={styles.breathLabel}>
+          {timerState === 'idle' ? t.timerIdle : timerState === 'running' ? t.timerRunning : timerState === 'paused' ? t.timerPaused : ''}
+        </Text>
       </View>
 
       {/* Timer + goal status */}
@@ -144,7 +141,7 @@ export default function TimerScreen() {
         {/* Goal reached banner */}
         {goalReached && (
           <Animated.View style={[styles.goalBanner, goalStyle]}>
-            <Text style={styles.goalBannerText}>✦ Goal reached — keep going or complete</Text>
+            <Text style={styles.goalBannerText}>{t.goalReached}</Text>
           </Animated.View>
         )}
 
@@ -152,7 +149,7 @@ export default function TimerScreen() {
         {!goalReached && target !== null && isRunning && remaining !== null && (
           <Text style={styles.targetHint}>
             {remaining > 0
-              ? `${formatTarget(remaining)} remaining`
+              ? `${formatTarget(remaining)} ${t.remaining}`
               : `${formatTarget(target)} target`}
           </Text>
         )}
@@ -177,24 +174,24 @@ export default function TimerScreen() {
         {isIdle && (
           <Pressable style={styles.startButton} onPress={start}>
             <Text style={styles.startButtonText}>
-              {activePreset.seconds ? `Begin · ${activePreset.label}` : 'Begin'}
+              {activePreset.seconds ? `${t.begin} · ${activePreset.label}` : t.begin}
             </Text>
           </Pressable>
         )}
 
         {isRunning && (
           <Pressable style={styles.pauseButton} onPress={pause}>
-            <Text style={styles.pauseButtonText}>Pause</Text>
+            <Text style={styles.pauseButtonText}>{t.pause}</Text>
           </Pressable>
         )}
 
         {isPaused && (
           <View style={styles.pausedControls}>
             <Pressable style={styles.resumeButton} onPress={resume}>
-              <Text style={styles.resumeButtonText}>Resume</Text>
+              <Text style={styles.resumeButtonText}>{t.resume}</Text>
             </Pressable>
             <Pressable style={styles.endButton} onPress={end}>
-              <Text style={styles.endButtonText}>Complete</Text>
+              <Text style={styles.endButtonText}>{t.complete}</Text>
             </Pressable>
           </View>
         )}

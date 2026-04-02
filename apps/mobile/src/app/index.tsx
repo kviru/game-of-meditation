@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
 import { router, Redirect } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useOnboardingStore } from '@/store/onboardingStore'
+import { useT } from '@/hooks/useT'
 import {
   useSessionStore,
   selectTotalMinutes,
@@ -14,6 +15,7 @@ import { theme } from '@/theme'
 export default function HomeScreen() {
   const insets             = useSafeAreaInsets()
   const onboardingComplete = useOnboardingStore((s) => s.completed)
+  const t                  = useT()
 
   if (!onboardingComplete) return <Redirect href="/onboarding" />
   const totalMinutes = useSessionStore(selectTotalMinutes)
@@ -35,8 +37,8 @@ export default function HomeScreen() {
     >
       {/* Hero */}
       <View style={styles.hero}>
-        <Text style={styles.title}>Game of{'\n'}Meditation</Text>
-        <Text style={styles.tagline}>Conquer Yourself.{'\n'}One Breath At A Time.</Text>
+        <Text style={styles.title}>{t.appTitle}</Text>
+        <Text style={styles.tagline}>{t.tagline}</Text>
       </View>
 
       {/* Buddha Level card — shown once player has history */}
@@ -49,17 +51,17 @@ export default function HomeScreen() {
         <View style={styles.statsRow}>
           <View style={styles.stat}>
             <Text style={styles.statValue}>{streak}</Text>
-            <Text style={styles.statLabel}>{streak === 1 ? 'Day streak' : 'Day streak'} 🔥</Text>
+            <Text style={styles.statLabel}>{t.dayStreak} 🔥</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.stat}>
             <Text style={styles.statValue}>{sessionCount}</Text>
-            <Text style={styles.statLabel}>{sessionCount === 1 ? 'Session' : 'Sessions'}</Text>
+            <Text style={styles.statLabel}>{t.sessions}</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.stat}>
             <Text style={styles.statValue}>{totalMinutes}</Text>
-            <Text style={styles.statLabel}>{totalMinutes === 1 ? 'Minute' : 'Minutes'}</Text>
+            <Text style={styles.statLabel}>{t.minutes}</Text>
           </View>
         </View>
       )}
@@ -71,7 +73,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/timer')}
         >
           <Text style={styles.primaryButtonText}>
-            {hasHistory ? 'Meditate' : "Let's Play"}
+            {hasHistory ? t.ctaMeditate : t.ctaFirst}
           </Text>
         </Pressable>
 
@@ -80,7 +82,7 @@ export default function HomeScreen() {
             style={styles.secondaryButton}
             onPress={() => router.push('/history')}
           >
-            <Text style={styles.secondaryButtonText}>Your Journey</Text>
+            <Text style={styles.secondaryButtonText}>{t.yourJourney}</Text>
           </Pressable>
         )}
       </View>
