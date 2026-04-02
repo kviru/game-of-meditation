@@ -79,6 +79,14 @@ export default function RootLayout() {
             name="profile"
             options={{ animation: 'slide_from_right' }}
           />
+          <Stack.Screen
+            name="clubs"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="clubs/[id]"
+            options={{ animation: 'slide_from_right' }}
+          />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

@@ -97,6 +97,13 @@ export default function HomeScreen() {
             <Text style={styles.secondaryButtonText}>{t.yourJourney}</Text>
           </Pressable>
         )}
+
+        <Pressable
+          style={styles.secondaryButton}
+          onPress={() => router.push('/clubs')}
+        >
+          <Text style={styles.secondaryButtonText}>👥 Clubs</Text>
+        </Pressable>
       </View>
     </ScrollView>
   )
