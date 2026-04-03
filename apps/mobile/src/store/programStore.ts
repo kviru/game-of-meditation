@@ -98,6 +98,7 @@ interface ProgramStore {
   getDaysCompleted: (programId: string) => number
   isEnrolled: (programId: string) => boolean
   setActiveProgramSession: (session: ActiveProgramSession | null) => void
+  resetAllData: () => void   // full wipe — used on onboarding reset
 
   /** The day number the user should work on next (1-based). Returns null if not enrolled or program complete. */
   nextDay: (programId: string, totalDays: number) => number | null
@@ -110,6 +111,8 @@ export const useProgramStore = create<ProgramStore>()(
       activeProgramSession: null,
 
       setActiveProgramSession: (session) => set({ activeProgramSession: session }),
+
+      resetAllData: () => set({ enrollments: {}, activeProgramSession: null }),
 
       enroll: (programId) =>
         set((s) => {

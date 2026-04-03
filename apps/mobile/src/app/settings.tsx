@@ -6,6 +6,8 @@ import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useReminderStore, MICRO_INTERVALS } from '@/store/reminderStore'
 import { useOnboardingStore } from '@/store/onboardingStore'
+import { useSessionStore } from '@/store/sessionStore'
+import { useProgramStore } from '@/store/programStore'
 import { theme } from '@/theme'
 
 // ─── Hour picker (hour-only, 1h steps) ────────────────────────
@@ -98,7 +100,9 @@ export default function SettingsScreen() {
     setMicroReminders, disableMicroReminders,
   } = useReminderStore()
 
-  const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding)
+  const resetOnboarding  = useOnboardingStore((s) => s.resetOnboarding)
+  const resetSessions    = useSessionStore((s) => s.resetAllData)
+  const resetPrograms    = useProgramStore((s) => s.resetAllData)
 
   // Daily reminder local state
   const [localHour,   setLocalHour]   = useState(hour)
@@ -321,7 +325,12 @@ export default function SettingsScreen() {
         <Text style={styles.sectionLabel}>Developer</Text>
         <Pressable
           style={styles.card}
-          onPress={() => { resetOnboarding(); router.replace('/onboarding') }}
+          onPress={() => {
+            resetSessions()
+            resetPrograms()
+            resetOnboarding()
+            router.replace('/onboarding')
+          }}
         >
           <Text style={styles.cardTitle}>Reset onboarding</Text>
           <Text style={styles.cardHint}>Re-runs the first-launch flow.</Text>

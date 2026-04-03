@@ -65,6 +65,7 @@ interface SessionStore {
   startSession: () => void
   endSession: () => void
   resetTimer: () => void
+  resetAllData: () => void   // full wipe — used on onboarding reset
 }
 
 /**
@@ -166,6 +167,20 @@ export const useSessionStore = create<SessionStore>()(
           goalReachedAt: null,
           activePreset: PRESETS[0],
           activeSessionType: 'open' as SessionTypeKey,
+        }),
+
+      resetAllData: () =>
+        set({
+          timerState: 'idle',
+          elapsedSeconds: 0,
+          sessionStartedAt: null,
+          goalReachedAt: null,
+          activePreset: PRESETS[0],
+          activeSessionType: 'open' as SessionTypeKey,
+          completedSessions: [],
+          totalSeconds: 0,
+          currentStreak: 0,
+          lastSessionDate: null,
         }),
     }),
     {
