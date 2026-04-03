@@ -46,6 +46,8 @@ export default function ProgramsScreen() {
         const enrolled     = isEnrolled(program.id)
         const daysComplete = getDaysCompleted(program.id)
         const progress     = daysComplete / program.durationDays
+        const isCompleted  = enrolled && daysComplete >= program.durationDays
+        const accentColor  = DIFFICULTY_COLOR[program.difficulty]
 
         return (
           <Pressable
@@ -53,18 +55,28 @@ export default function ProgramsScreen() {
             style={styles.card}
             onPress={() => router.push(`/programs/${program.id}`)}
           >
+            {/* Left difficulty accent bar */}
+            <View style={[styles.accentBar, { backgroundColor: accentColor }]} />
+
             {/* Card top row */}
             <View style={styles.cardTop}>
-              <Text style={styles.cardEmoji}>{program.coverEmoji}</Text>
+              <View style={styles.cardEmojiWrap}>
+                <Text style={styles.cardEmoji}>{program.coverEmoji}</Text>
+              </View>
               <View style={styles.cardBadges}>
-                <View style={[styles.badge, { borderColor: DIFFICULTY_COLOR[program.difficulty] }]}>
-                  <Text style={[styles.badgeText, { color: DIFFICULTY_COLOR[program.difficulty] }]}>
+                <View style={[styles.badge, { borderColor: accentColor, backgroundColor: accentColor + '18' }]}>
+                  <Text style={[styles.badgeText, { color: accentColor }]}>
                     {DIFFICULTY_LABEL[program.difficulty]}
                   </Text>
                 </View>
-                {enrolled && (
+                {enrolled && !isCompleted && (
                   <View style={styles.enrolledBadge}>
-                    <Text style={styles.enrolledBadgeText}>Enrolled</Text>
+                    <Text style={styles.enrolledBadgeText}>● Enrolled</Text>
+                  </View>
+                )}
+                {isCompleted && (
+                  <View style={styles.completedBadge}>
+                    <Text style={styles.completedBadgeText}>✓ Done</Text>
                   </View>
                 )}
               </View>
@@ -73,9 +85,12 @@ export default function ProgramsScreen() {
             {/* Title + meta */}
             <Text style={styles.cardTitle}>{program.title}</Text>
             <View style={styles.cardMeta}>
-              <Text style={styles.metaItem}>📅 {program.durationDays} days</Text>
-              <Text style={styles.metaDot}>·</Text>
-              <Text style={styles.metaItem}>⏱ {program.dailyMinutes} min/day</Text>
+              <View style={styles.metaPill}>
+                <Text style={styles.metaItem}>📅 {program.durationDays} days</Text>
+              </View>
+              <View style={styles.metaPill}>
+                <Text style={styles.metaItem}>⏱ {program.dailyMinutes} min/day</Text>
+              </View>
             </View>
 
             <Text style={styles.cardDesc} numberOfLines={3}>
@@ -86,7 +101,12 @@ export default function ProgramsScreen() {
             {enrolled && (
               <View style={styles.progressSection}>
                 <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+                  <View
+                    style={[
+                      styles.progressFill,
+                      { width: `${progress * 100}%`, backgroundColor: isCompleted ? theme.colors.gold : theme.colors.primary },
+                    ]}
+                  />
                 </View>
                 <Text style={styles.progressLabel}>
                   {daysComplete}/{program.durationDays} days complete
@@ -94,14 +114,10 @@ export default function ProgramsScreen() {
               </View>
             )}
 
-            {/* CTA */}
-            <View style={styles.cardFooter}>
-              <Text style={styles.cardCta}>
-                {enrolled
-                  ? daysComplete >= program.durationDays
-                    ? '✓ Completed'
-                    : 'Continue →'
-                  : 'View Program →'}
+            {/* CTA button */}
+            <View style={[styles.ctaButton, enrolled ? styles.ctaButtonEnrolled : styles.ctaButtonDefault]}>
+              <Text style={[styles.ctaText, enrolled ? styles.ctaTextEnrolled : styles.ctaTextDefault]}>
+                {isCompleted ? '✓  Completed' : enrolled ? 'Continue →' : 'View Program →'}
               </Text>
             </View>
           </Pressable>
@@ -127,14 +143,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: 16,
   },
+
+  // Header
   header: {
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   back: {
     fontSize: 14,
     color: theme.colors.textMuted,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   title: {
     fontSize: 32,
@@ -147,44 +165,70 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     lineHeight: 22,
   },
+
+  // Card
   card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radii.lg,
     borderWidth: 1,
     borderColor: theme.colors.border,
     padding: 20,
+    paddingLeft: 24,
     gap: 10,
+    overflow: 'hidden',
+  },
+  accentBar: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 4,
+    borderTopLeftRadius: theme.radii.lg,
+    borderBottomLeftRadius: theme.radii.lg,
   },
   cardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
+  cardEmojiWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: theme.colors.surfaceElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
   cardEmoji: {
-    fontSize: 36,
+    fontSize: 28,
   },
   cardBadges: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
     flexWrap: 'wrap',
     justifyContent: 'flex-end',
+    paddingTop: 4,
   },
   badge: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 10,
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 4,
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.3,
+    fontWeight: '700',
+    letterSpacing: 0.4,
   },
   enrolledBadge: {
-    backgroundColor: theme.colors.primary + '33',
-    borderRadius: 12,
+    backgroundColor: theme.colors.primary + '22',
+    borderRadius: 10,
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: theme.colors.primary + '50',
   },
   enrolledBadgeText: {
     fontSize: 11,
@@ -192,24 +236,42 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     letterSpacing: 0.3,
   },
+  completedBadge: {
+    backgroundColor: theme.colors.gold + '22',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: theme.colors.gold + '60',
+  },
+  completedBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.gold,
+    letterSpacing: 0.3,
+  },
   cardTitle: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '700',
     color: theme.colors.textPrimary,
-    lineHeight: 26,
+    lineHeight: 25,
   },
   cardMeta: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+    gap: 8,
+  },
+  metaPill: {
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.radii.full,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   metaItem: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textMuted,
-  },
-  metaDot: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
+    fontWeight: '500',
   },
   cardDesc: {
     fontSize: 14,
@@ -227,24 +289,46 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: theme.colors.primary,
     borderRadius: 3,
   },
   progressLabel: {
     fontSize: 12,
     color: theme.colors.textMuted,
   },
-  cardFooter: {
-    paddingTop: 4,
+
+  // CTA button
+  ctaButton: {
+    marginTop: 2,
+    borderRadius: theme.radii.md,
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    borderWidth: 1,
   },
-  cardCta: {
+  ctaButtonDefault: {
+    backgroundColor: theme.colors.surfaceElevated,
+    borderColor: theme.colors.primary + '50',
+  },
+  ctaButtonEnrolled: {
+    backgroundColor: theme.colors.primary + '18',
+    borderColor: theme.colors.primary + '70',
+  },
+  ctaText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  ctaTextDefault: {
     color: theme.colors.primary,
   },
+  ctaTextEnrolled: {
+    color: theme.colors.primary,
+  },
+
+  // Coming soon
   comingSoon: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 20,
   },
   comingSoonText: {
     fontSize: 13,

@@ -320,6 +320,54 @@ export default function SettingsScreen() {
         </View>
       </View>
 
+      {/* ── About section ── */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>About</Text>
+        <View style={styles.card}>
+          <View style={styles.aboutHeader}>
+            <View style={styles.aboutIconWrap}>
+              <Text style={styles.aboutIcon}>🧘</Text>
+            </View>
+            <View style={styles.aboutTitleBlock}>
+              <Text style={styles.aboutAppName}>Game of Meditation</Text>
+              <Text style={styles.aboutTagline}>Conquer Yourself. One Breath At A Time.</Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>Developed by</Text>
+            <Text style={styles.aboutValue}>Viru Kulkarni</Text>
+          </View>
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>Role</Text>
+            <Text style={styles.aboutValue}>Software Consultant</Text>
+          </View>
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>Contact</Text>
+            <Text style={[styles.aboutValue, styles.aboutContact]}>+91 9980504921</Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.aboutFooterRow}>
+            <View style={styles.aboutBadge}>
+              <Text style={styles.aboutBadgeText}>MIT License</Text>
+            </View>
+            <View style={styles.aboutBadge}>
+              <Text style={styles.aboutBadgeText}>Open Source</Text>
+            </View>
+            <View style={styles.aboutBadge}>
+              <Text style={styles.aboutBadgeText}>Free for All</Text>
+            </View>
+          </View>
+          <Text style={styles.aboutMission}>
+            Built for humanity. No ads. No data selling. No pay-to-win. Ever.
+          </Text>
+        </View>
+      </View>
+
       {/* ── Developer section ── */}
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Developer</Text>
@@ -463,6 +511,84 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: theme.colors.primary,
   },
+  // About section
+  aboutHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  aboutIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aboutIcon: {
+    fontSize: 28,
+  },
+  aboutTitleBlock: {
+    flex: 1,
+    gap: 3,
+  },
+  aboutAppName: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  aboutTagline: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    fontStyle: 'italic',
+    lineHeight: 17,
+  },
+  aboutRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  aboutLabel: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  aboutValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  aboutContact: {
+    color: theme.colors.sky,
+  },
+  aboutFooterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  aboutBadge: {
+    borderRadius: theme.radii.full,
+    borderWidth: 1,
+    borderColor: theme.colors.primary + '50',
+    backgroundColor: theme.colors.primary + '14',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  aboutBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.primary,
+    letterSpacing: 0.3,
+  },
+  aboutMission: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+
   // Local mode
   localModeNote: {
     fontSize: 13,

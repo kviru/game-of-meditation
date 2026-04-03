@@ -116,25 +116,31 @@ export default function TimerScreen() {
   const progress  = target ? Math.min(elapsedSeconds / target, 1) : null
   const remaining = target ? Math.max(target - elapsedSeconds, 0) : null
 
+  const breathStateLabel =
+    timerState === 'idle'    ? t.timerIdle :
+    timerState === 'running' ? t.timerRunning :
+    timerState === 'paused'  ? t.timerPaused : ''
+
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
 
       {/* Header */}
       <View style={styles.header}>
         <Pressable
+          style={styles.headerActionPill}
           onPress={isIdle ? () => router.back() : confirmEnd}
-          hitSlop={16}
+          hitSlop={8}
         >
-          <Text style={styles.headerAction}>{isIdle ? t.back : t.end}</Text>
+          <Text style={styles.headerActionText}>{isIdle ? t.back : t.end}</Text>
         </Pressable>
       </View>
 
-      {/* Breathing visual */}
+      {/* Breathing visual with ambient rings */}
       <View style={styles.visualArea}>
+        <View style={styles.glowRingOuter} pointerEvents="none" />
+        <View style={styles.glowRingInner} pointerEvents="none" />
         <BreathingCircle isRunning={isRunning} isPaused={isPaused} size={240} />
-        <Text style={styles.breathLabel}>
-          {timerState === 'idle' ? t.timerIdle : timerState === 'running' ? t.timerRunning : timerState === 'paused' ? t.timerPaused : ''}
-        </Text>
+        <Text style={styles.breathLabel}>{breathStateLabel}</Text>
       </View>
 
       {/* Timer + goal status */}
@@ -148,7 +154,7 @@ export default function TimerScreen() {
           </Animated.View>
         )}
 
-        {/* Remaining time or target hint */}
+        {/* Remaining time hint */}
         {!goalReached && target !== null && isRunning && remaining !== null && (
           <Text style={styles.targetHint}>
             {remaining > 0
@@ -210,30 +216,64 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
     paddingHorizontal: 32,
   },
+
+  // Header
   header: {
     height: 56,
     justifyContent: 'center',
     alignItems: 'flex-end',
   },
-  headerAction: {
-    fontSize: 16,
-    color: theme.colors.textMuted,
+  headerActionPill: {
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.radii.full,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
+  headerActionText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    fontWeight: '500',
+  },
+
+  // Visual area with glow rings
   visualArea: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 32,
   },
-  breathLabel: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+  glowRingOuter: {
+    position: 'absolute',
+    width: 316,
+    height: 316,
+    borderRadius: 158,
+    borderWidth: 1,
+    borderColor: theme.colors.primary + '18',
+    backgroundColor: 'transparent',
   },
+  glowRingInner: {
+    position: 'absolute',
+    width: 278,
+    height: 278,
+    borderRadius: 139,
+    borderWidth: 1,
+    borderColor: theme.colors.primary + '28',
+    backgroundColor: 'transparent',
+  },
+  breathLabel: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    fontWeight: '500',
+  },
+
+  // Timer area
   timerArea: {
     alignItems: 'center',
-    paddingVertical: 24,
+    paddingVertical: 20,
     gap: 12,
   },
   goalBanner: {
@@ -248,6 +288,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: theme.colors.gold,
     letterSpacing: 0.5,
+    fontWeight: '600',
   },
   targetHint: {
     fontSize: 13,
@@ -256,19 +297,23 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     width: '100%',
-    height: 2,
+    height: 4,
     backgroundColor: theme.colors.border,
-    borderRadius: 1,
+    borderRadius: 2,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: theme.colors.primary,
-    borderRadius: 1,
+    borderRadius: 2,
   },
+
+  // Preset area
   presetArea: {
     paddingBottom: 16,
   },
+
+  // Controls
   controls: {
     paddingBottom: 16,
     minHeight: 80,
@@ -279,23 +324,30 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: theme.radii.lg,
     alignItems: 'center',
+    elevation: 10,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 20,
+    shadowOpacity: 0.5,
   },
   startButtonText: {
     color: '#fff',
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '700',
     letterSpacing: 0.5,
   },
   pauseButton: {
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.primary + '60',
     paddingVertical: 20,
     borderRadius: theme.radii.lg,
     alignItems: 'center',
+    backgroundColor: theme.colors.surface,
   },
   pauseButtonText: {
     color: theme.colors.textSecondary,
     fontSize: 18,
+    fontWeight: '500',
   },
   pausedControls: {
     flexDirection: 'row',
@@ -307,16 +359,22 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: theme.radii.lg,
     alignItems: 'center',
+    elevation: 8,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 14,
+    shadowOpacity: 0.4,
   },
   resumeButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   endButton: {
     flex: 1,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     paddingVertical: 20,
     borderRadius: theme.radii.lg,
     alignItems: 'center',
@@ -324,5 +382,6 @@ const styles = StyleSheet.create({
   endButtonText: {
     color: theme.colors.textSecondary,
     fontSize: 18,
+    fontWeight: '500',
   },
 })
