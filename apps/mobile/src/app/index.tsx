@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native'
 import { router, Redirect } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useOnboardingStore } from '@/store/onboardingStore'
-import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import {
   useSessionStore,
@@ -16,7 +15,6 @@ import { theme } from '@/theme'
 export default function HomeScreen() {
   const insets             = useSafeAreaInsets()
   const onboardingComplete = useOnboardingStore((s) => s.completed)
-  const user               = useAuthStore((s) => s.user)
   const t                  = useT()
 
   if (!onboardingComplete) return <Redirect href="/onboarding" />
@@ -43,7 +41,7 @@ export default function HomeScreen() {
           <Text style={styles.title}>{t.appTitle}</Text>
           <View style={styles.heroActions}>
             <Pressable onPress={() => router.push('/profile')} hitSlop={12}>
-              <Text style={styles.authLink}>{user ? '👤' : '👤'}</Text>
+              <Text style={styles.authLink}>👤</Text>
             </Pressable>
             <Pressable onPress={() => router.push('/settings')} hitSlop={12}>
               <Text style={styles.authLink}>⚙️</Text>
@@ -103,13 +101,6 @@ export default function HomeScreen() {
           onPress={() => router.push('/programs')}
         >
           <Text style={styles.secondaryButtonText}>📅 21-Day Programs</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.secondaryButton}
-          onPress={() => router.push('/clubs')}
-        >
-          <Text style={styles.secondaryButtonText}>👥 Clubs</Text>
         </Pressable>
 
         <Pressable

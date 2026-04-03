@@ -1,11 +1,10 @@
 import { useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, Pressable, TextInput,
-  ScrollView, ActivityIndicator,
+  ScrollView,
 } from 'react-native'
 import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useAuthStore } from '@/store/authStore'
 import {
   useSessionStore,
   selectTotalMinutes,
@@ -14,13 +13,10 @@ import {
 } from '@/store/sessionStore'
 import { useOnboardingStore, LANGUAGES } from '@/store/onboardingStore'
 import { BuddhaLevelCard } from '@/components/BuddhaLevelCard'
-import { supabase } from '@/lib/supabase'
 import { theme } from '@/theme'
 
 export default function ProfileScreen() {
   const insets       = useSafeAreaInsets()
-  const user         = useAuthStore((s) => s.user)
-  const signOut      = useAuthStore((s) => s.signOut)
 
   const totalMinutes = useSessionStore(selectTotalMinutes)
   const sessionCount = useSessionStore(selectSessionCount)
@@ -36,20 +32,12 @@ export default function ProfileScreen() {
 
   const [editingName, setEditingName] = useState(false)
   const [nameInput,   setNameInput]   = useState(name)
-  const [saving,      setSaving]      = useState(false)
 
-  const saveName = useCallback(async () => {
+  const saveName = useCallback(() => {
     const trimmed = nameInput.trim()
     setName(trimmed)
     setEditingName(false)
-
-    // Sync to Supabase profile if signed in
-    if (user) {
-      setSaving(true)
-      await supabase.from('profiles').update({ display_name: trimmed }).eq('id', user.id)
-      setSaving(false)
-    }
-  }, [nameInput, user, setName])
+  }, [nameInput, setName])
 
   return (
     <ScrollView
@@ -84,11 +72,8 @@ export default function ProfileScreen() {
                 returnKeyType="done"
                 onSubmitEditing={saveName}
               />
-              <Pressable onPress={saveName} disabled={saving}>
-                {saving
-                  ? <ActivityIndicator color={theme.colors.primary} />
-                  : <Text style={styles.saveText}>Save</Text>
-                }
+              <Pressable onPress={saveName}>
+                <Text style={styles.saveText}>Save</Text>
               </Pressable>
             </View>
           ) : (
@@ -96,10 +81,7 @@ export default function ProfileScreen() {
               <Text style={styles.displayName}>{name || 'Tap to set name'} ✏️</Text>
             </Pressable>
           )}
-          {user
-            ? <Text style={styles.email}>{user.email}</Text>
-            : <Text style={styles.anonNote}>Playing anonymously</Text>
-          }
+          <Text style={styles.localNote}>📱 Your data is stored privately on this device</Text>
         </View>
       </View>
 
@@ -144,17 +126,6 @@ export default function ProfileScreen() {
           ))}
         </ScrollView>
       </View>
-
-      {/* Account actions */}
-      {user ? (
-        <Pressable style={styles.signOutButton} onPress={signOut}>
-          <Text style={styles.signOutText}>Sign out</Text>
-        </Pressable>
-      ) : (
-        <Pressable style={styles.signInButton} onPress={() => router.push('/auth')}>
-          <Text style={styles.signInText}>Sign in to sync across devices</Text>
-        </Pressable>
-      )}
     </ScrollView>
   )
 }
@@ -226,12 +197,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: theme.colors.textPrimary,
   },
-  email: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-  anonNote: {
-    fontSize: 13,
+  localNote: {
+    fontSize: 12,
     color: theme.colors.textMuted,
     fontStyle: 'italic',
   },
@@ -299,29 +266,6 @@ const styles = StyleSheet.create({
   },
   langLabelActive: {
     color: theme.colors.primary,
-    fontWeight: '600',
-  },
-  signOutButton: {
-    paddingVertical: 16,
-    borderRadius: theme.radii.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ff4444',
-  },
-  signOutText: {
-    fontSize: 16,
-    color: '#ff6666',
-    fontWeight: '500',
-  },
-  signInButton: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 18,
-    borderRadius: theme.radii.lg,
-    alignItems: 'center',
-  },
-  signInText: {
-    color: '#fff',
-    fontSize: 16,
     fontWeight: '600',
   },
 })

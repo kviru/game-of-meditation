@@ -5,7 +5,6 @@ import {
 import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useReminderStore } from '@/store/reminderStore'
-import { useAuthStore } from '@/store/authStore'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { theme } from '@/theme'
 
@@ -60,8 +59,6 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets()
 
   const { enabled, hour, minute, setReminder, disableReminder } = useReminderStore()
-  const signOut        = useAuthStore((s) => s.signOut)
-  const user           = useAuthStore((s) => s.user)
   const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding)
 
   const [localHour,   setLocalHour]   = useState(hour)
@@ -135,23 +132,29 @@ export default function SettingsScreen() {
         )}
       </View>
 
-      {/* Account */}
+      {/* Privacy — local-only mode */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Account</Text>
-        {user ? (
-          <View style={styles.card}>
-            <Text style={styles.accountEmail}>{user.email}</Text>
-            <View style={styles.divider} />
-            <Pressable onPress={signOut}>
-              <Text style={styles.signOutText}>Sign out</Text>
-            </Pressable>
+        <Text style={styles.sectionLabel}>Privacy</Text>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardMeta}>
+              <Text style={styles.cardTitle}>Local-only mode</Text>
+              <Text style={styles.cardHint}>
+                All your sessions, streaks, and progress are stored privately on this device only. Nothing is sent to any server.
+              </Text>
+            </View>
+            <Switch
+              value={true}
+              disabled={true}
+              trackColor={{ true: theme.colors.primary }}
+              thumbColor="#fff"
+            />
           </View>
-        ) : (
-          <Pressable style={styles.card} onPress={() => router.push('/auth')}>
-            <Text style={styles.cardTitle}>Sign in to sync your journey</Text>
-            <Text style={styles.cardHint}>Free. Your data stays yours.</Text>
-          </Pressable>
-        )}
+          <View style={styles.divider} />
+          <Text style={styles.localModeNote}>
+            🔒 Your meditation practice is yours alone. Cloud sync will be an optional, opt-in feature in a future release.
+          </Text>
+        </View>
       </View>
 
       {/* Dev tools */}
@@ -248,13 +251,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  accountEmail: {
-    fontSize: 15,
-    color: theme.colors.textSecondary,
-  },
-  signOutText: {
-    fontSize: 15,
-    color: '#ff6666',
-    fontWeight: '500',
+  localModeNote: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    lineHeight: 20,
+    fontStyle: 'italic',
   },
 })
