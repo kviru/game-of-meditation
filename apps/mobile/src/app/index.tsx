@@ -16,15 +16,16 @@ export default function HomeScreen() {
   const insets             = useSafeAreaInsets()
   const onboardingComplete = useOnboardingStore((s) => s.completed)
   const t                  = useT()
-
-  if (!onboardingComplete) return <Redirect href="/onboarding" />
-  const totalMinutes = useSessionStore(selectTotalMinutes)
-  const sessionCount = useSessionStore(selectSessionCount)
-  const streak       = useSessionStore(selectCurrentStreak)
-  const totalMss     = useSessionStore((s) =>
+  const totalMinutes       = useSessionStore(selectTotalMinutes)
+  const sessionCount       = useSessionStore(selectSessionCount)
+  const streak             = useSessionStore(selectCurrentStreak)
+  const totalMss           = useSessionStore((s) =>
     s.completedSessions.reduce((acc, s) => acc + s.mssDelta, 0)
   )
-  const hasHistory   = sessionCount > 0
+  const hasHistory         = sessionCount > 0
+
+  // All hooks must be called before any early return (Rules of Hooks)
+  if (!onboardingComplete) return <Redirect href="/onboarding" />
 
   return (
     <ScrollView
